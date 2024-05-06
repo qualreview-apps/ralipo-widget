@@ -5,11 +5,11 @@ import { FC, useEffect, useState } from 'react';
 import { RalipoContext } from './contex/ralipo-context';
 
 function useInitApp(props: {
-  showWidget?: boolean;
+  // showWidget?: boolean;
   showLauncher?: boolean;
   apiKey: string;
 }) {
-  const { apiKey, showLauncher, showWidget } = props;
+  const { apiKey, showLauncher } = props;
   const [scriptLoaded, scriptError] = useScript();
   const [ralipoObject, setRalipoObject] =
     useState<RalipoObjectWithoutInitialize | null>(null);
@@ -21,7 +21,7 @@ function useInitApp(props: {
 
     if (window && window.ralipo) {
       const { initialize, ...rest } = handleRalipoInit();
-      initialize(apiKey, { showLauncher, showWidget });
+      initialize(apiKey, { showLauncher });
       setRalipoObject({ ...rest });
     } else {
       setTimeout(init, 1000);
@@ -42,12 +42,11 @@ function useInitApp(props: {
   }, [scriptLoaded]);
 
   return {
-    ralipoObject,
+    ...ralipoObject,
   };
 }
 
 const RalipoProvider: FC<RalipoProviderProps> = ({
-  showWidget,
   showLauncher,
   children,
   apiKey,
@@ -55,13 +54,12 @@ const RalipoProvider: FC<RalipoProviderProps> = ({
   const response = useInitApp({
     apiKey,
     showLauncher,
-    showWidget,
   });
 
-  const ralipoObject = response.ralipoObject as RalipoObjectWithoutInitialize;
+  const ralipoObject = response as RalipoObjectWithoutInitialize;
 
   return (
-    <RalipoContext.Provider value={{ ralipoObject }}>
+    <RalipoContext.Provider value={{ ...ralipoObject }}>
       {children}
     </RalipoContext.Provider>
   );
